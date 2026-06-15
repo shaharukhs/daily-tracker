@@ -1,0 +1,272 @@
+// Prisma schema — DB-portable. Switch `provider` to mysql/sqlserver/sqlite/mongodb,
+// adjust DATABASE_URL, then run `pnpm db:migrate` to generate new migrations.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Identity ────────────────────────────────────────────────────────────────
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  displayName     String
+  passwordHash    String
+  isActive        Boolean  @default(true)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  refreshTokens     RefreshToken[]
+  preferences       UserTrackerPreference[]
+  subscription      UserSubscription?
+  salahEntries      SalahEntry[]
+  waterEntries      WaterEntry[]
+  adhkarEntries     AdhkarEntry[]
+  quranEntries      QuranEntry[]
+  exerciseEntries   ExerciseEntry[]
+  junkFreeEntries   JunkFreeEntry[]
+  foodLogEntries    FoodLogEntry[]
+  weightEntries     WeightEntry[]
+  reflectionEntries ReflectionEntry[]
+
+  @@index([email])
+}
+
+/// Hashed refresh tokens (rotation + revocation). Raw token never stored.
+model RefreshToken {
+  id         String   @id @default(cuid())
+  userId     String
+  tokenHash  String   @unique
+  userAgent  String?
+  ipAddress  String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ─── Subscriptions & Trackers ────────────────────────────────────────────────
+
+model SubscriptionPlan {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g. "free", "pro", "premium"
+  name        String
+  priceCents  Int      @default(0)
+  currency    String   @default("USD")
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  planTrackers PlanTracker[]
+  subscriptions UserSubscription[]
+}
+
+/// Which trackers a plan unlocks.
+model PlanTracker {
+  planId      String
+  trackerCode String
+
+  plan SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@id([planId, trackerCode])
+  @@index([trackerCode])
+}
+
+model UserSubscription {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  planId    String
+  startedAt DateTime @default(now())
+  expiresAt DateTime?
+  status    SubscriptionStatus @default(ACTIVE)
+
+  user User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@index([planId])
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PAST_DUE
+}
+
+/// Per-user show/hide for trackers their plan unlocks.
+model UserTrackerPreference {
+  userId      String
+  trackerCode String
+  enabled     Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, trackerCode])
+  @@index([userId])
+}
+
+// ─── Tracker tables ──────────────────────────────────────────────────────────
+// Each tracker owns its own table — open/closed: add a new module + table, no edits to existing ones.
+
+enum SalahStatus {
+  MISSED
+  QADHA
+  ON_TIME
+  IN_JAMAAH
+}
+
+model SalahEntry {
+  id             String      @id @default(cuid())
+  userId         String
+  date           DateTime    @db.Date
+  fajr           SalahStatus @default(MISSED)
+  dhuhr          SalahStatus @default(MISSED)
+  asr            SalahStatus @default(MISSED)
+  maghrib        SalahStatus @default(MISSED)
+  isha           SalahStatus @default(MISSED)
+  fajrSunnah     Boolean     @default(false)
+  dhuhrSunnah    Boolean     @default(false)
+  maghribSunnah  Boolean     @default(false)
+  ishaSunnahWitr Boolean     @default(false)
+  tahajjud       Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model WaterEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  glasses   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model AdhkarEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  morning   Boolean  @default(false)
+  evening   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model QuranEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  pages     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model ExerciseEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  exercised Boolean  @default(false)
+  steps     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model JunkFreeEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  junkFree  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model FoodLogEntry {
+  id             String   @id @default(cuid())
+  userId         String
+  date           DateTime @db.Date
+  suhoorTime     String?
+  suhoorCalories Int?
+  lunchTime      String?
+  lunchCalories  Int?
+  dinnerTime     String?
+  dinnerCalories Int?
+  snackTime      String?
+  snackCalories  Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model WeightEntry {
+  id             String   @id @default(cuid())
+  userId         String
+  date           DateTime @db.Date
+  weightKg       Float
+  lostThisWeekKg Float?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model ReflectionEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  text      String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
