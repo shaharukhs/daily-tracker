@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-// Strong password: min 12 chars, upper, lower, digit, special. Defends against weak credentials.
+// Strong password: min 8 chars, upper, lower, digit, special. Defends against weak credentials.
 const passwordSchema = z
   .string()
-  .min(12, 'Password must be at least 12 characters')
+  .min(8, 'Password must be at least 8 characters')
   .max(128, 'Password too long')
   .regex(/[A-Z]/, 'Must contain an uppercase letter')
   .regex(/[a-z]/, 'Must contain a lowercase letter')

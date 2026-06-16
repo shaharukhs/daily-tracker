@@ -82,7 +82,7 @@ export default function RegisterPage() {
               autoComplete="new-password"
             />
             <p className="mt-1 text-xs text-muted">
-              At least 12 characters, with upper &amp; lower case, a digit, and a symbol.
+              At least 8 characters, with upper &amp; lower case, a digit, and a symbol.
             </p>
           </div>
 

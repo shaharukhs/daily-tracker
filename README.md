@@ -1,5 +1,9 @@
 # Daily Tracker
 
+### 🌙 Live app: **https://daily-tracker-web-kohl.vercel.app**
+
+> Open the link, create an account, and start tracking. (The API is on a free tier that sleeps when idle, so the first request after a while may take ~30–60s to wake.)
+
 **The Self-Dignified Muslim Woman — Daily Tracker.** A multi-user, subscription-aware habit
 tracker. Sign in, and track your day across 9 trackers (Salah, Adhkar, Quran, Exercise, Water,
 Junk-Free, Food Log, Weekly Weigh-In, Reflection) — everything syncs per user, per day.
@@ -68,7 +72,7 @@ pnpm dev
 ```
 
 Then open **http://localhost:3000**, click **Create account**, and start tracking.
-(Password rules: at least 12 characters with an uppercase letter, a lowercase letter, a digit, and a symbol.)
+(Password rules: at least 8 characters with an uppercase letter, a lowercase letter, a digit, and a symbol.)
 
 To stop: `Ctrl+C` the `pnpm dev` process, then `pnpm db:down` to stop the database.
 
