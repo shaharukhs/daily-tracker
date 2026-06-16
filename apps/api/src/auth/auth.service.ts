@@ -32,7 +32,7 @@ export class AuthService {
     meta: { userAgent?: string; ipAddress?: string } = {},
   ): Promise<AuthResult> {
     const existing = await this.prisma.user.findUnique({ where: { email: input.email } });
-    if (existing) {
+    if (existing && existing.isActive) {
       // Same error for "already exists" and "weak password" cases is good practice;
       // here registration is explicit so a conflict is fine.
       throw new ConflictException('Email already in use');
@@ -45,25 +45,34 @@ export class AuthService {
       parallelism: 1,
     });
 
-    const defaultPlan = await this.prisma.subscriptionPlan.findFirst({ where: { isDefault: true } });
+    const defaultPlan = existing
+      ? null
+      : await this.prisma.subscriptionPlan.findFirst({ where: { isDefault: true } });
 
-    const user = await this.prisma.user.create({
-      data: {
-        email: input.email,
-        displayName: input.displayName,
-        passwordHash,
-        ...(defaultPlan && {
-          subscription: { create: { planId: defaultPlan.id } },
-        }),
-        preferences: {
-          create: ALL_TRACKER_CODES.map((code, idx) => ({
-            trackerCode: code,
-            enabled: TRACKER_METADATA[code].defaultEnabled,
-            sortOrder: idx,
-          })),
-        },
-      },
-    });
+    const user = existing
+      ? // Archived account re-registering: reactivate it. All previous data
+        // (preferences, subscription, tracker entries) is preserved and restored.
+        await this.prisma.user.update({
+          where: { id: existing.id },
+          data: { isActive: true, passwordHash, displayName: input.displayName },
+        })
+      : await this.prisma.user.create({
+          data: {
+            email: input.email,
+            displayName: input.displayName,
+            passwordHash,
+            ...(defaultPlan && {
+              subscription: { create: { planId: defaultPlan.id } },
+            }),
+            preferences: {
+              create: ALL_TRACKER_CODES.map((code, idx) => ({
+                trackerCode: code,
+                enabled: TRACKER_METADATA[code].defaultEnabled,
+                sortOrder: idx,
+              })),
+            },
+          },
+        });
 
     const accessToken = this.tokens.signAccessToken({ sub: user.id, email: user.email });
     const { token: refreshToken, expiresAt } = await this.tokens.issueRefreshToken(user.id, meta);
@@ -121,5 +130,17 @@ export class AuthService {
     } else {
       await this.tokens.revokeAllForUser(userId);
     }
+  }
+
+  /**
+   * Soft-delete ("archive") an account on user request. No data is deleted — the user
+   * row and all related records are kept. The account is marked inactive (which the JWT
+   * strategy, login and refresh all reject) and every refresh token is revoked, so the
+   * user is locked out immediately. They regain access only by registering again with
+   * the same email, which reactivates this account (see `register`).
+   */
+  async archiveAccount(userId: string): Promise<void> {
+    await this.prisma.user.update({ where: { id: userId }, data: { isActive: false } });
+    await this.tokens.revokeAllForUser(userId);
   }
 }

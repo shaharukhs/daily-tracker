@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpCode,
   HttpStatus,
   Post,
@@ -90,6 +91,18 @@ export class AuthController {
   ) {
     const raw = req.cookies?.[REFRESH_COOKIE] as string | undefined;
     await this.auth.logout(raw, user.id);
+    res.clearCookie(REFRESH_COOKIE, this.cookieOptions(0));
+  }
+
+  @Delete('account')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAccount(
+    @CurrentUser() user: AuthUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    // Soft-delete: archive the account (no data removed) and log the user out everywhere.
+    await this.auth.archiveAccount(user.id);
     res.clearCookie(REFRESH_COOKIE, this.cookieOptions(0));
   }
 
