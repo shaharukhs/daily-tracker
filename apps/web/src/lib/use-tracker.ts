@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './auth';
+import { useLoginGate } from './login-gate';
 
 /**
  * Generic per-day tracker hook. Handles load (GET /trackers/<code>/<date>),
@@ -16,12 +17,16 @@ export function useTracker<T extends Record<string, unknown>>(opts: {
   parse: (raw: Record<string, unknown> | null) => T;
   fallback: T;
 }) {
-  const { authFetch } = useAuth();
+  const { authFetch, status } = useAuth();
+  const { requestLogin } = useLoginGate();
   const qc = useQueryClient();
   const key = [opts.code, opts.date];
+  const isGuest = status !== 'authed';
 
   const query = useQuery({
     queryKey: key,
+    // Guests aren't authenticated — don't hit the API (it would 401); show empty defaults.
+    enabled: status === 'authed',
     queryFn: async () => {
       const res = await authFetch(`/trackers/${opts.code}/${opts.date}`);
       if (!res.ok) throw new Error('Failed to load');
@@ -54,6 +59,13 @@ export function useTracker<T extends Record<string, unknown>>(opts: {
   return {
     data: query.data ?? opts.fallback,
     isLoading: query.isLoading,
-    save: (next: T) => mutation.mutate(next),
+    // Guests can explore, but any write prompts them to sign in (nothing is persisted).
+    save: (next: T) => {
+      if (isGuest) {
+        requestLogin();
+        return;
+      }
+      mutation.mutate(next);
+    },
   };
 }

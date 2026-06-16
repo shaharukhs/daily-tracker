@@ -9,8 +9,9 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (status === 'authed') router.replace('/tracker');
-    else if (status === 'anon') router.replace('/login');
+    // Everyone lands on the tracker — authed users see their data, guests get a
+    // browsable preview that prompts them to sign in when they try to save.
+    if (status !== 'loading') router.replace('/tracker');
   }, [status, router]);
 
   return (

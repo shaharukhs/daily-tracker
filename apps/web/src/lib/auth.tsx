@@ -32,6 +32,8 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, displayName: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  /** Soft-delete the current account (archive). Logs the user out on success. */
+  deleteAccount: () => Promise<void>;
   /** Authenticated fetch against the API. Auto-refreshes the access token once on 401. */
   authFetch: (path: string, init?: RequestInit) => Promise<Response>;
 }
@@ -144,8 +146,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setStatus('anon');
   }, [authFetch]);
 
+  const deleteAccount = useCallback(async () => {
+    const res = await authFetch('/auth/account', { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete account');
+    tokenRef.current = null;
+    setUser(null);
+    setStatus('anon');
+  }, [authFetch]);
+
   return (
-    <AuthContext.Provider value={{ user, status, login, register, logout, authFetch }}>
+    <AuthContext.Provider
+      value={{ user, status, login, register, logout, deleteAccount, authFetch }}
+    >
       {children}
     </AuthContext.Provider>
   );
