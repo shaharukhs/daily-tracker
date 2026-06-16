@@ -17,7 +17,8 @@ services:
       pnpm --filter @daily-tracker/shared build &&
       pnpm --filter @daily-tracker/api exec prisma generate &&
       pnpm --filter @daily-tracker/api build &&
-      pnpm --filter @daily-tracker/api exec prisma migrate deploy
+      pnpm --filter @daily-tracker/api exec prisma migrate deploy &&
+      pnpm --filter @daily-tracker/api prisma:seed
     # nest build emits to apps/api/dist/src/main.js (tsconfig rootDir is "./").
     startCommand: node apps/api/dist/src/main.js
     healthCheckPath: /api/v1/health

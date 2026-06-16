@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { ALL_TRACKER_CODES, TRACKER_CODES } from '@daily-tracker/shared';
+import { ALL_TRACKER_CODES } from '@daily-tracker/shared';
 
 const prisma = new PrismaClient();
 
@@ -44,6 +44,17 @@ async function main() {
   await upsertPlanTrackers(premium.id, premiumTrackers);
 
   console.log('Seeded plans:', { free: free.code, pro: pro.code, premium: premium.code });
+
+  // Backfill: ensure every user has a subscription. This self-heals accounts created
+  // before the plans were seeded (which would otherwise see no trackers).
+  const usersWithoutSub = await prisma.user.findMany({
+    where: { subscription: null },
+    select: { id: true },
+  });
+  for (const u of usersWithoutSub) {
+    await prisma.userSubscription.create({ data: { userId: u.id, planId: free.id } });
+  }
+  console.log(`Backfilled default subscription for ${usersWithoutSub.length} user(s).`);
 }
 
 main()
