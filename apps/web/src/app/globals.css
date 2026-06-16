@@ -7,27 +7,44 @@
 }
 
 body {
-  @apply bg-stone-100 text-ink antialiased;
+  @apply bg-cream font-sans text-ink antialiased;
+  background-image: radial-gradient(circle at 1px 1px, rgba(42, 39, 35, 0.04) 1px, transparent 0);
+  background-size: 22px 22px;
 }
 
-/* Reusable bits */
 @layer components {
   .card {
-    @apply rounded-2xl border border-stone-200 bg-white shadow-sm;
+    @apply rounded-2xl border border-edge bg-white shadow-card;
   }
+
+  .brand-title {
+    @apply font-display font-semibold tracking-tight;
+  }
+
+  /* Editorial Qur'an verse styling */
+  .verse {
+    @apply font-display italic text-brand-700;
+  }
+
   .section-title {
-    @apply text-sm font-semibold uppercase tracking-wide text-brand-700;
+    @apply flex items-center gap-2 font-display text-base font-semibold text-brand-800;
   }
+  .section-title::before {
+    content: '';
+    @apply inline-block h-3.5 w-1 rounded-full bg-gold-500;
+  }
+
   .btn {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60;
   }
   .btn-primary {
-    @apply btn bg-brand-600 text-white hover:bg-brand-700;
+    @apply btn bg-brand-600 text-white shadow-sm hover:bg-brand-700;
   }
   .btn-ghost {
-    @apply btn border border-stone-300 bg-white text-ink hover:bg-stone-50;
+    @apply btn border border-edge bg-white text-ink hover:bg-brand-50;
   }
+
   .input {
-    @apply w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+    @apply w-full rounded-xl border border-edge bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100;
   }
 }

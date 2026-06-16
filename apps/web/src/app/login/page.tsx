@@ -34,8 +34,14 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="card w-full max-w-sm p-8">
-        <h1 className="text-2xl font-bold">My Daily Tracker</h1>
-        <p className="mt-1 text-sm text-muted">Sign in to continue.</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-gold-600">
+          Liqā — The Meeting
+        </p>
+        <h1 className="brand-title mt-1 text-3xl">My Daily Tracker</h1>
+        <p className="verse mt-3 text-sm leading-snug">
+          “Remember Me, and I will remember you.”
+        </p>
+        <p className="text-xs text-muted">— Qur’an 2:152</p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div>

@@ -44,8 +44,11 @@ export default function RegisterPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="card w-full max-w-sm p-8">
-        <h1 className="text-2xl font-bold">Create your account</h1>
-        <p className="mt-1 text-sm text-muted">Start tracking your day.</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-gold-600">
+          Liqā — The Meeting
+        </p>
+        <h1 className="brand-title mt-1 text-3xl">Create your account</h1>
+        <p className="mt-1 text-sm text-muted">Begin your daily tracker.</p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div>

@@ -46,10 +46,13 @@ export default function TrackerPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-stone-200 bg-white">
+      <header className="border-b border-edge bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
           <div>
-            <h1 className="text-lg font-bold">My Daily Tracker</h1>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gold-600">
+              Liqā — The Meeting
+            </p>
+            <h1 className="brand-title text-xl leading-tight">My Daily Tracker</h1>
             <p className="text-xs text-muted">Welcome, {user?.displayName}</p>
           </div>
           <button type="button" className="btn-ghost" onClick={() => void logout()}>

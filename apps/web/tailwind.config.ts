@@ -5,19 +5,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Clean adaptation of the PDF palette — warm neutral surface, teal primary.
+        // Warm, dignified palette: ivory surface, deep emerald primary, soft gold accent.
+        cream: '#faf6f0',
+        ink: '#2a2723',
+        muted: '#8a8076',
+        edge: '#ece4d8',
         brand: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          500: '#14b8a6',
-          600: '#0d9488',
-          700: '#0f766e',
+          50: '#eef7f3',
+          100: '#d4ebe1',
+          200: '#abd8c6',
+          400: '#4fae8e',
+          500: '#2f9576',
+          600: '#1f7d61',
+          700: '#185f4a',
+          800: '#134a3a',
         },
-        ink: '#1f2937',
-        muted: '#6b7280',
+        gold: {
+          400: '#d8b572',
+          500: '#c79a4e',
+          600: '#a87f3a',
+        },
       },
       fontFamily: {
-        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
+      },
+      boxShadow: {
+        card: '0 1px 2px rgba(42, 39, 35, 0.04), 0 8px 24px -12px rgba(42, 39, 35, 0.12)',
       },
     },
   },
