@@ -125,6 +125,27 @@ Prisma also supports MySQL/SQLite/SQL Server/MongoDB — change `provider` in
 
 ---
 
+## Deploy to the cloud (free tier)
+
+Stack: **Vercel** (web) · **Render** (API, `render.yaml` included) · **Neon** (Postgres). All deploy from this GitHub repo.
+
+The web app proxies `/api/*` to the API (see `rewrites()` in `apps/web/next.config.mjs`) so the
+browser stays same-origin and the auth cookie works without any CORS/cookie changes.
+
+1. **Neon** — create a free project + `daily_tracker` DB; copy the connection string (append
+   `?sslmode=require`). This is `DATABASE_URL`.
+2. **Render** — New → Blueprint → pick this repo (uses `render.yaml`). Set the dashboard secrets:
+   `DATABASE_URL` (Neon), `JWT_ACCESS_SECRET` & `JWT_REFRESH_SECRET` (`openssl rand -base64 48` each),
+   `CORS_ORIGIN` (your Vercel URL). The build runs `prisma migrate deploy`; then seed once from
+   Render's Shell: `pnpm --filter @daily-tracker/api prisma:seed`. Check `/api/v1/health`.
+3. **Vercel** — New Project → this repo, **Root Directory `apps/web`**. Env:
+   `API_ORIGIN=<your Render API URL>` and `NEXT_PUBLIC_API_URL=` (empty). Deploy.
+
+> Render's free API sleeps when idle (first request after ~15 min takes 30–60s to wake). Optional:
+> keep it warm with a free cron ping to `/api/v1/health`.
+
+---
+
 ## Troubleshooting
 
 - **`pnpm: command not found`** — install pnpm (`brew install pnpm`) or run `corepack enable`.
