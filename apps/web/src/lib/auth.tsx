@@ -10,7 +10,12 @@ import {
   type ReactNode,
 } from 'react';
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+// Leave NEXT_PUBLIC_API_URL unset in the cloud: the client then uses the relative
+// `/api/v1`, which next.config.mjs proxies to the API (same-origin → cookies just work).
+// Local dev falls back to the local API when the var isn't provided.
+const API =
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '');
 const BASE = `${API}/api/v1`;
 
 export interface User {
