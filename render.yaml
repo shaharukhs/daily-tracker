@@ -9,9 +9,11 @@ services:
     plan: free
     # Build the shared package, generate the Prisma client, build the API,
     # then apply migrations against the (Neon) database.
+    # --prod=false forces devDependencies (typescript, nest/prisma CLIs, ts-node) to install
+    # even though NODE_ENV=production — they're needed to build.
     buildCommand: >
       corepack enable &&
-      pnpm install --frozen-lockfile &&
+      pnpm install --frozen-lockfile --prod=false &&
       pnpm --filter @daily-tracker/shared build &&
       pnpm --filter @daily-tracker/api exec prisma generate &&
       pnpm --filter @daily-tracker/api build &&
