@@ -43,8 +43,16 @@ export function AccountMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 z-40 mt-2 w-44 overflow-hidden rounded-xl border border-edge bg-white shadow-card"
+          className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-edge bg-white shadow-card"
         >
+          <Link
+            href="/customize"
+            role="menuitem"
+            className="block px-4 py-2.5 text-sm hover:bg-brand-50"
+            onClick={() => setOpen(false)}
+          >
+            Customize dashboard
+          </Link>
           <Link
             href="/account"
             role="menuitem"

@@ -54,7 +54,7 @@ export default function TrackerPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-edge bg-white/80 backdrop-blur">
+      <header className="relative z-30 border-b border-edge bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gold-600">

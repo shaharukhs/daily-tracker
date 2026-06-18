@@ -11,12 +11,13 @@
   },
   "dependencies": {
     "@daily-tracker/shared": "workspace:*",
+    "@hookform/resolvers": "^3.9.0",
     "@tanstack/react-query": "^5.51.21",
+    "framer-motion": "^11",
     "next": "14.2.5",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.52.2",
-    "@hookform/resolvers": "^3.9.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
