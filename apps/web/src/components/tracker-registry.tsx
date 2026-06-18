@@ -13,6 +13,7 @@ import { SleepCard } from './sleep-card';
 import { MoodCard } from './mood-card';
 import { FastingCard } from './fasting-card';
 import { SadaqahCard } from './sadaqah-card';
+import { MedicineSection } from './medicine-card';
 
 /** Maps a tracker code (from the API/preferences) to its UI card. */
 export const TRACKER_CARDS: Record<string, ComponentType<{ date: string }>> = {
@@ -30,4 +31,5 @@ export const TRACKER_CARDS: Record<string, ComponentType<{ date: string }>> = {
   mood: MoodCard,
   fasting: FastingCard,
   sadaqah: SadaqahCard,
+  medicine: MedicineSection,
 };
