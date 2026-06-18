@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { safeLine } from './text';
 
 // Strong password: min 8 chars, upper, lower, digit, special. Defends against weak credentials.
 const passwordSchema = z
@@ -12,7 +13,7 @@ const passwordSchema = z
 
 export const registerSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
-  displayName: z.string().trim().min(1).max(80),
+  displayName: safeLine(80, 1),
   password: passwordSchema,
 });
 

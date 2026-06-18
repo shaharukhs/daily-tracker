@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { safeLine, safeText } from './text';
 
 /** ISO date (YYYY-MM-DD) — entries are scoped to a calendar day per user. */
 export const isoDate = z
@@ -56,7 +57,7 @@ export const junkFreeEntrySchema = z.object({
 export type JunkFreeEntryInput = z.infer<typeof junkFreeEntrySchema>;
 
 /** Time of day as free text (e.g. "07:30"); calories optional per meal. */
-const mealTime = z.string().trim().max(10).optional();
+const mealTime = safeLine(10).optional();
 const mealCalories = z.number().int().min(0).max(20_000).optional();
 
 export const foodLogEntrySchema = z.object({
@@ -81,7 +82,7 @@ export type WeightEntryInput = z.infer<typeof weightEntrySchema>;
 
 export const reflectionEntrySchema = z.object({
   date: isoDate,
-  text: z.string().max(5000),
+  text: safeText(5000),
 });
 export type ReflectionEntryInput = z.infer<typeof reflectionEntrySchema>;
 
@@ -101,7 +102,7 @@ export type SleepEntryInput = z.infer<typeof sleepEntrySchema>;
 export const moodEntrySchema = z.object({
   date: isoDate,
   mood: z.number().int().min(0).max(5).default(0),
-  gratitude: z.string().max(2000).default(''),
+  gratitude: safeText(2000).default(''),
 });
 export type MoodEntryInput = z.infer<typeof moodEntrySchema>;
 
@@ -119,7 +120,7 @@ export const sadaqahEntrySchema = z.object({
   date: isoDate,
   given: z.boolean().default(false),
   amount: z.number().int().min(0).max(10_000_000).optional(),
-  note: z.string().trim().max(280).optional(),
+  note: safeLine(280).optional(),
 });
 export type SadaqahEntryInput = z.infer<typeof sadaqahEntrySchema>;
 

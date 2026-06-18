@@ -18,6 +18,7 @@ export const TRACKER_CODES = {
   MOOD: 'mood',
   FASTING: 'fasting',
   SADAQAH: 'sadaqah',
+  MEDICINE: 'medicine',
 } as const;
 
 export type TrackerCode = (typeof TRACKER_CODES)[keyof typeof TRACKER_CODES];
@@ -96,6 +97,11 @@ export const TRACKER_METADATA: Record<
   [TRACKER_CODES.SADAQAH]: {
     label: 'Sadaqah — Charity',
     description: 'Charity given today.',
+    defaultEnabled: false,
+  },
+  [TRACKER_CODES.MEDICINE]: {
+    label: 'Medicine',
+    description: 'Your medicines and daily doses.',
     defaultEnabled: false,
   },
 };
