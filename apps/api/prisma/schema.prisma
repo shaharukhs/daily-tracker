@@ -39,6 +39,8 @@ model User {
   moodEntries       MoodEntry[]
   fastingEntries    FastingEntry[]
   sadaqahEntries    SadaqahEntry[]
+  medicineCards     MedicineCard[]
+  glowProducts      GlowProduct[]
 
   @@index([email])
 }
@@ -350,4 +352,85 @@ model SadaqahEntry {
 
   @@unique([userId, date])
   @@index([userId, date])
+}
+
+// ─── Medicine (configurable, multi-instance) ─────────────────────────────────
+// A user can have multiple medicine cards (one per scenario, e.g. "Blood pressure").
+// Each card holds medicines; each medicine is taken at one or more daily slots;
+// doses are checked off per day via MedicineDoseLog.
+
+model MedicineCard {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  note      String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medicines Medicine[]
+
+  @@index([userId])
+}
+
+model Medicine {
+  id        String   @id @default(cuid())
+  cardId    String
+  name      String
+  note      String?
+  slots     String[]
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  card  MedicineCard      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  doses MedicineDoseLog[]
+
+  @@index([cardId])
+}
+
+model MedicineDoseLog {
+  id         String   @id @default(cuid())
+  medicineId String
+  date       DateTime @db.Date
+  slot       String
+  taken      Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+
+  medicine Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+
+  @@unique([medicineId, date, slot])
+  @@index([medicineId, date])
+}
+
+// ─── Glow Up (user-managed daily-use products) ───────────────────────────────
+
+model GlowProduct {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  note      String?
+  routine   String // MORNING | EVENING | ANYTIME
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs GlowLog[]
+
+  @@index([userId])
+}
+
+model GlowLog {
+  id        String   @id @default(cuid())
+  productId String
+  date      DateTime @db.Date
+  done      Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+
+  product GlowProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, date])
+  @@index([productId, date])
 }

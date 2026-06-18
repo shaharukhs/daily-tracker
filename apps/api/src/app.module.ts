@@ -22,6 +22,8 @@ import { SleepModule } from './trackers/sleep/sleep.module';
 import { MoodModule } from './trackers/mood/mood.module';
 import { FastingModule } from './trackers/fasting/fasting.module';
 import { SadaqahModule } from './trackers/sadaqah/sadaqah.module';
+import { MedicineModule } from './trackers/medicine/medicine.module';
+import { GlowModule } from './glow/glow.module';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -59,6 +61,8 @@ import { HealthController } from './health/health.controller';
     MoodModule,
     FastingModule,
     SadaqahModule,
+    MedicineModule,
+    GlowModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
