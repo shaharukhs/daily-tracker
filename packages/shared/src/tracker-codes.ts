@@ -13,6 +13,11 @@ export const TRACKER_CODES = {
   FOOD_LOG: 'food_log',
   WEIGHT: 'weight',
   REFLECTION: 'reflection',
+  MEDITATION: 'meditation',
+  SLEEP: 'sleep',
+  MOOD: 'mood',
+  FASTING: 'fasting',
+  SADAQAH: 'sadaqah',
 } as const;
 
 export type TrackerCode = (typeof TRACKER_CODES)[keyof typeof TRACKER_CODES];
@@ -67,5 +72,30 @@ export const TRACKER_METADATA: Record<
     label: "Today's Reflection",
     description: 'My letter to Allah.',
     defaultEnabled: true,
+  },
+  [TRACKER_CODES.MEDITATION]: {
+    label: 'Meditation',
+    description: 'Mindful minutes today.',
+    defaultEnabled: false,
+  },
+  [TRACKER_CODES.SLEEP]: {
+    label: 'Sleep',
+    description: 'Hours slept and how rested you feel.',
+    defaultEnabled: false,
+  },
+  [TRACKER_CODES.MOOD]: {
+    label: 'Mood & Gratitude',
+    description: "Today's mood and what you're grateful for.",
+    defaultEnabled: false,
+  },
+  [TRACKER_CODES.FASTING]: {
+    label: 'Fasting',
+    description: 'Sunnah, Ramadan, and voluntary fasts.',
+    defaultEnabled: false,
+  },
+  [TRACKER_CODES.SADAQAH]: {
+    label: 'Sadaqah — Charity',
+    description: 'Charity given today.',
+    defaultEnabled: false,
   },
 };

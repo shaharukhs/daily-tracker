@@ -17,6 +17,11 @@ import { JunkFreeModule } from './trackers/junk-free/junk-free.module';
 import { FoodLogModule } from './trackers/food-log/food-log.module';
 import { WeightModule } from './trackers/weight/weight.module';
 import { ReflectionModule } from './trackers/reflection/reflection.module';
+import { MeditationModule } from './trackers/meditation/meditation.module';
+import { SleepModule } from './trackers/sleep/sleep.module';
+import { MoodModule } from './trackers/mood/mood.module';
+import { FastingModule } from './trackers/fasting/fasting.module';
+import { SadaqahModule } from './trackers/sadaqah/sadaqah.module';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -49,6 +54,11 @@ import { HealthController } from './health/health.controller';
     FoodLogModule,
     WeightModule,
     ReflectionModule,
+    MeditationModule,
+    SleepModule,
+    MoodModule,
+    FastingModule,
+    SadaqahModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

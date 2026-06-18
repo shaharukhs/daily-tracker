@@ -1,6 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { TRACKER_METADATA, type PreferenceUpdateInput, type TrackerCode } from '@daily-tracker/shared';
+import {
+  TRACKER_METADATA,
+  type PreferenceUpdateInput,
+  type PreferencesLayoutInput,
+  type TrackerCode,
+} from '@daily-tracker/shared';
 
 export interface PreferenceView {
   trackerCode: string;
@@ -72,5 +77,39 @@ export class PreferencesService {
       includedInPlan: true,
       sortOrder: pref.sortOrder,
     };
+  }
+
+  /**
+   * Save the whole dashboard layout in one shot: each card's enabled state + position.
+   * Only trackers in the user's plan are persisted; unknown/out-of-plan codes are ignored.
+   */
+  async saveLayout(userId: string, items: PreferencesLayoutInput['items']): Promise<PreferenceView[]> {
+    const sub = await this.prisma.userSubscription.findUnique({
+      where: { userId },
+      include: { plan: { include: { planTrackers: true } } },
+    });
+    const planCodes = new Set(sub?.plan.planTrackers.map((pt) => pt.trackerCode) ?? []);
+
+    // Keep only valid, in-plan trackers.
+    const valid = items.filter(
+      (i) => planCodes.has(i.trackerCode) && TRACKER_METADATA[i.trackerCode as TrackerCode],
+    );
+
+    await this.prisma.$transaction(
+      valid.map((i) =>
+        this.prisma.userTrackerPreference.upsert({
+          where: { userId_trackerCode: { userId, trackerCode: i.trackerCode } },
+          update: { enabled: i.enabled, sortOrder: i.sortOrder },
+          create: {
+            userId,
+            trackerCode: i.trackerCode,
+            enabled: i.enabled,
+            sortOrder: i.sortOrder,
+          },
+        }),
+      ),
+    );
+
+    return this.listForUser(userId);
   }
 }

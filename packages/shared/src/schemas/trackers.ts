@@ -85,8 +85,60 @@ export const reflectionEntrySchema = z.object({
 });
 export type ReflectionEntryInput = z.infer<typeof reflectionEntrySchema>;
 
+export const meditationEntrySchema = z.object({
+  date: isoDate,
+  minutes: z.number().int().min(0).max(600),
+});
+export type MeditationEntryInput = z.infer<typeof meditationEntrySchema>;
+
+export const sleepEntrySchema = z.object({
+  date: isoDate,
+  hours: z.number().min(0).max(24),
+  quality: z.number().int().min(0).max(5).default(0),
+});
+export type SleepEntryInput = z.infer<typeof sleepEntrySchema>;
+
+export const moodEntrySchema = z.object({
+  date: isoDate,
+  mood: z.number().int().min(0).max(5).default(0),
+  gratitude: z.string().max(2000).default(''),
+});
+export type MoodEntryInput = z.infer<typeof moodEntrySchema>;
+
+export const fastType = z.enum(['ramadan', 'sunnah', 'qadha', 'voluntary']);
+export type FastType = z.infer<typeof fastType>;
+
+export const fastingEntrySchema = z.object({
+  date: isoDate,
+  fasted: z.boolean().default(false),
+  fastType: fastType.optional(),
+});
+export type FastingEntryInput = z.infer<typeof fastingEntrySchema>;
+
+export const sadaqahEntrySchema = z.object({
+  date: isoDate,
+  given: z.boolean().default(false),
+  amount: z.number().int().min(0).max(10_000_000).optional(),
+  note: z.string().trim().max(280).optional(),
+});
+export type SadaqahEntryInput = z.infer<typeof sadaqahEntrySchema>;
+
 export const preferenceUpdateSchema = z.object({
   trackerCode: z.string().min(1).max(64),
   enabled: z.boolean(),
 });
 export type PreferenceUpdateInput = z.infer<typeof preferenceUpdateSchema>;
+
+/** Bulk dashboard layout update: each catalog card's enabled state + position. */
+export const preferencesLayoutSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        trackerCode: z.string().min(1).max(64),
+        enabled: z.boolean(),
+        sortOrder: z.number().int().min(0).max(1000),
+      }),
+    )
+    .max(100),
+});
+export type PreferencesLayoutInput = z.infer<typeof preferencesLayoutSchema>;
